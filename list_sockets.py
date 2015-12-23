@@ -5,6 +5,7 @@ import psutil
 import time
 import os
 import test_function
+import test_packet
 from socket import AF_INET, SOCK_STREAM, SOCK_DGRAM
 from contextlib import redirect_stdout
 
@@ -20,7 +21,8 @@ class Monitor(object):
             (AF_INET, SOCK_DGRAM): 'udp',
             (AF_INET6, SOCK_DGRAM): 'udp6',
         }
-        self.records = set()
+        self.records = []
+        self.socket = test_packet.buildSocket()
 
     def displayTempl(self):
         print(self.templ % (
@@ -35,6 +37,9 @@ class Monitor(object):
             except psutil.Error:
                 pass
         return procNames
+
+    def cachePacket(self):
+        test_packet.capturePacket(self.socket, self.records)
 
     def getSockets(self):
         procNames = self.getProcName()
@@ -60,10 +65,10 @@ class Monitor(object):
         file = os.path.join(path, timeStamp)
         with open(file, "w") as f:
             with redirect_stdout(f):
-                self.getUsage()
-                self.displayTempl()
+                print(len(self.records))
                 for i in range(len(self.records)):
-                    print(self.templ % self.records.pop())
+                    print(self.records.pop(-1))
+                # self.getUsage()
 
 def iterWriter(dir):
 
@@ -78,7 +83,7 @@ def iterWriter(dir):
             start_time = time.time()
             timeStr = time.strftime("%Y-%m-%d_%H:%M:%S")
         else:
-            m.getSockets()
+            m.cachePacket()
 
 def main():
     resDir = r'ResultDB'

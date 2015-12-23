@@ -199,7 +199,7 @@ def receivePacket(num):
                     print('Process : ' + str(process))
                 else:
                     print('Source Port : ' + str(source_port) + ' Dest Port : ' + str(dest_port)
-                                                 + ' Length : ' + str(length) + ' Checksum : ' + str(checksum))
+                            + ' Length : ' + str(length) + ' Checksum : ' + str(checksum))
 
                 h_size = eth_length + iph_length + udph_length
                 data_size = len(packet) - h_size
@@ -213,14 +213,13 @@ def receivePacket(num):
             else:
                 print('Protocol other than TCP/UDP/ICMP')
 
-def socketToProcess():
-    sockets = psutil.net_connections(kind='inet')
-    for socket in sockets:
-        if socket.pid:
-            print(socket)
-            p = psutil.Process(socket.pid)
-            print(p.name())
-
+# def socketToProcess():
+#     sockets = psutil.net_connections(kind='inet')
+#     for socket in sockets:
+#         if socket.pid:
+#             print(socket)
+#             p = psutil.Process(socket.pid)
+#             print(p.name())
 
 # def mapProcess():
 #     p1 = Popen(['lsof', '-a', '-p9004', '-i4'], stdout=PIPE)

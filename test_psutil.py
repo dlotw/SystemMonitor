@@ -10,5 +10,16 @@ def socketToProcess():
             p = psutil.Process(socket.pid)
             print(p.name())
 
+def mapPortProc():
+    portProc = {}
+    for c in psutil.net_connections(kind='inet'):
+        p = psutil.Process(c.pid)
+        portProc[str(c.laddr[1])] = p.name()
+    return portProc
+
+
 if __name__ == "__main__":
-    socketToProcess()
+    # socketToProcess()
+    ret = mapPortProc()
+    for k, v in ret.items():
+        print(k, v)
