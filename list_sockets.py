@@ -8,6 +8,7 @@ import test_function
 import test_packet
 from socket import AF_INET, SOCK_STREAM, SOCK_DGRAM
 from contextlib import redirect_stdout
+import csv
 
 class Monitor(object):
 
@@ -64,22 +65,27 @@ class Monitor(object):
     def dumpData(self, path, timeStamp):
         file = os.path.join(path, timeStamp)
         with open(file, "w") as f:
-            with redirect_stdout(f):
-                print(len(self.records))
-                for i in range(len(self.records)):
-                    print(self.records.pop(-1))
-                # self.getUsage()
+            writer = csv.writer(f, delimiter=',')
+            for i in range(len(self.records)):
+                writer.writerow(self.records.pop(-1))
+            # with redirect_stdout(f):
+            #     # print(len(self.records))
+            #     for i in range(len(self.records)):
+            #         print(self.records.pop(-1))
+            #     # self.getUsage()
+
 
 def iterWriter(dir):
 
     start_time = time.time()
     timeStr = time.strftime("%Y-%m-%d_%H:%M:%S")
     m = Monitor()
-    interval = 10
+    interval = 2
 
     while True:
         if int(time.time() - start_time) > interval:
-            m.dumpData(dir, timeStr+".db")
+            print('Dump data for time interval starting from {}'.format(timeStr))
+            m.dumpData(dir, timeStr+".csv")
             start_time = time.time()
             timeStr = time.strftime("%Y-%m-%d_%H:%M:%S")
         else:
