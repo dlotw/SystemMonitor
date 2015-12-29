@@ -50,9 +50,9 @@ def capturePacket(s, res):
     eth_header = packet[:eth_length]
     eth = unpack('!6s6sH', eth_header)
     eth_protocol = socket.ntohs(eth[2])
-    res.append(['Length: {}'.format(len(packet))])
-    res[-1].append('Destination MAC: {}'.format(eth_addr(packet[0:6])))
-    res[-1].append('Source MAC: {}'.format(eth_addr(packet[6:12])))
+    res.append(['Len: {}'.format(len(packet))])
+    res[-1].append('DST MAC: {}'.format(eth_addr(packet[0:6])))
+    res[-1].append('SRC MAC: {}'.format(eth_addr(packet[6:12])))
 
 #Parse IP packets, IP Protocol number = 8
     if eth_protocol == 8:
@@ -69,16 +69,16 @@ def capturePacket(s, res):
 
         iph_length = ihl * 4
 
-        ttl = iph[5]
+        # ttl = iph[5]
         protocol = iph[6]
         s_addr = socket.inet_ntoa(iph[8])
         d_addr = socket.inet_ntoa(iph[9])
 
         res[-1].append('Version: {}'.format(str(version)))
-        res[-1].append('IP Header Length: {}'.format(str(ihl)))
-        res[-1].append('TTL: {}'.format(str(ttl)))
-        res[-1].append('Source Address: {}'.format(str(s_addr)))
-        res[-1].append('Destination Address: {}'.format(str(d_addr)))
+        # res[-1].append('IP Header Length: {}'.format(str(iph_length)))
+        # res[-1].append('TTL: {}'.format(str(ttl)))
+        res[-1].append('SRC Address: {}'.format(str(s_addr)))
+        res[-1].append('DST Address: {}'.format(str(d_addr)))
         if protocol in numToProtocol:
             res[-1].append('Protocol: {}'.format(numToProtocol[protocol]))
         else:
@@ -98,21 +98,27 @@ def capturePacket(s, res):
             sequence = tcph[2]
             acknowledgement = tcph[3]
             doff_reserved = tcph[4]
-            tcph_length = doff_reserved >> 4
+            # tcph_length = doff_reserved >> 4
 
-            res[-1].append('Source Port: ' + str(source_port))
-            res[-1].append('Dest Port: ' + str(dest_port))
-            res[-1].append('Sequence Number: ' + str(sequence))
-            res[-1].append('Acknowledgement: ' + str(acknowledgement))
-            res[-1].append('TCP header length: ' + str(tcph_length))
+            res[-1].append('SRC Port: ' + str(source_port))
+            res[-1].append('DST Port: ' + str(dest_port))
 
             if str(source_port) in portToProcess:
                 process = portToProcess[str(source_port)]
                 res[-1].append('Process: ' + str(process))
+            elif str(dest_port) in portToProcess:
+                process = portToProcess[str(dest_port)]
+                res[-1].append('Process: ' + str(process))
+            else:
+                res[-1].append('Process: ' + '-')
 
-            h_size = eth_length + iph_length + tcph_length * 4
-            data_size = len(packet) - h_size
-            res[-1].append('Data Size: ' + str(data_size))
+            # h_size = eth_length + iph_length + tcph_length * 4
+            # data_size = len(packet) - h_size
+            # res[-1].append('Data Size: ' + str(data_size))
+
+            res[-1].append('Seq: ' + str(sequence))
+            res[-1].append('Ack: ' + str(acknowledgement))
+            # res[-1].append('TCP Header Length: ' + str(tcph_length * 4))
 
             # get data from the packet
             # data = packet[h_size:].decode()
@@ -123,7 +129,7 @@ def capturePacket(s, res):
         elif protocol == 1:
             # print('ICMP protocol')
             u = iph_length + eth_length
-            icmph_length = 4
+            # icmph_length = 4
             icmp_header = packet[u:u+4]
 
             #now unpack them
@@ -137,9 +143,9 @@ def capturePacket(s, res):
             res[-1].append('Code: ' + str(code))
             res[-1].append('Checksum: ' + str(checksum))
 
-            h_size = eth_length + iph_length + icmph_length
-            data_size = len(packet) - h_size
-            res[-1].append('Data Size: ' + str(data_size))
+            # h_size = eth_length + iph_length + icmph_length
+            # data_size = len(packet) - h_size
+            # res[-1].append('Data Size: ' + str(data_size))
 
             # get data from the packet
             # data = packet[h_size:].decode()
@@ -150,7 +156,7 @@ def capturePacket(s, res):
         elif protocol == 17:
             # print('UDP protocol')
             u = iph_length + eth_length
-            udph_length = 8
+            # udph_length = 8
             udp_header = packet[u:u+8]
 
             #now unpack them
@@ -158,21 +164,27 @@ def capturePacket(s, res):
 
             source_port = udph[0]
             dest_port = udph[1]
-            length = udph[2]
+            # length = udph[2]
             checksum = udph[3]
 
-            res[-1].append('Source Port: ' + str(source_port))
-            res[-1].append('Dest Port: ' + str(dest_port))
-            res[-1].append('Length: ' + str(length))
-            res[-1].append('Checksum: ' + str(checksum))
+            res[-1].append('SRC Port: ' + str(source_port))
+            res[-1].append('DST Port: ' + str(dest_port))
 
             if str(source_port) in portToProcess:
                 process = portToProcess[str(source_port)]
                 res[-1].append('Process: ' + str(process))
+            elif str(dest_port) in portToProcess:
+                process = portToProcess[str(dest_port)]
+                res[-1].append('Process: ' + str(process))
+            else:
+                res[-1].append('Process: ' + '-')
 
-            h_size = eth_length + iph_length + udph_length
-            data_size = len(packet) - h_size
-            res[-1].append('Data Size: ' + str(data_size))
+            # h_size = eth_length + iph_length + udph_length
+            # data_size = len(packet) - h_size
+            # res[-1].append('Data Size: ' + str(data_size))
+
+            # res[-1].append('Length: ' + str(length))
+            res[-1].append('Checksum: ' + str(checksum))
 
             #get data from the packet
             # data = packet[h_size:].decode()
@@ -181,9 +193,10 @@ def capturePacket(s, res):
 
         #some other IP packet like IGMP
         else:
-            print('Protocol other than TCP/UDP/ICMP')
+            # print('Protocol other than TCP/UDP/ICMP')
             res[-1].append('Protocol other than TCP/UDP/ICMP')
-
+    else:
+        res[-1].append('Not IP Protocol')
 
 def main():
     s = buildSocket()
