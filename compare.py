@@ -1,4 +1,4 @@
-_author__ = 'LBJ'
+__author__ = 'LBJ'
 import os
 import re
 from collections import defaultdict
