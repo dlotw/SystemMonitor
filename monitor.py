@@ -90,7 +90,6 @@ def iterWriter(dir):
         if int(time.time() - start_time) > interval:
             print('Dump data for time interval starting from {}'.format(timeStr))
             m.dumpData(dir, timeStr+".csv")
-            break
             start_time = time.time()
             timeStr = time.strftime("%Y-%m-%d_%H:%M:%S")
         else:
